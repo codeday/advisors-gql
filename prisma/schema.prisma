@@ -18,10 +18,10 @@ enum RequestType {
 }
 
 model Advisor {
-  id                String      @id @default(cuid())
+  id String @id @default(cuid())
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   username          String?     @unique
   givenName         String
@@ -35,10 +35,10 @@ model Advisor {
 }
 
 model Request {
-  id         String @id @default(cuid())
+  id String @id @default(cuid())
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   username   String
   givenName  String
@@ -52,13 +52,13 @@ model Request {
 }
 
 model RequestAssignment {
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  advisor Advisor @relation(fields: [advisorId], references: [id])
+  advisor   Advisor @relation(fields: [advisorId], references: [id])
   advisorId String
 
-  request Request @relation(fields: [requestId], references: [id])
+  request   Request @relation(fields: [requestId], references: [id])
   requestId String
 
   @@id([advisorId, requestId])

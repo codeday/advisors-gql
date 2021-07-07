@@ -8,7 +8,7 @@
     "start": "node dist",
     "clean": "rm -rf dist",
     "prisma": "prisma format && prisma generate",
-    "build": "npm -s run clean && yarn run prisma && tsc",
+    "build": "npm -s run clean && yarn run prisma && tsc && cpy '**/*' '!**/*.ts' ../dist/ --cwd=src/ --no-overwrite --parents",
     "dev": "ts-node-dev --no-notify --respawn --transpile-only src",
     "debug": "ts-node-dev --no-notify --respawn src"
   },
@@ -50,6 +50,7 @@
     "@types/node-fetch": "^2.5.7",
     "@types/nodemailer": "^6.4.2",
     "@types/phone": "^2.4.1",
+    "cpy-cli": "^3.1.1",
     "eslint": "^7.6.0",
     "ts-node": "^8.10.2",
     "ts-node-dev": "^1.0.0-pre.56",
