@@ -1,0 +1,65 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum AdvisorType {
+  TECHNICAL
+  HR
+}
+
+enum RequestType {
+  RESUME
+  INTERVIEW
+}
+
+model Advisor {
+  id                String      @id @default(cuid())
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  username          String?     @unique
+  givenName         String
+  familyName        String
+  email             String      @unique
+  type              AdvisorType
+  resumesPerWeek    Float
+  interviewsPerWeek Float
+
+  requestAssignments RequestAssignment[]
+}
+
+model Request {
+  id         String @id @default(cuid())
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  username   String
+  givenName  String
+  familyName String
+  email      String
+
+  type      RequestType
+  resumeUrl String?
+
+  requestAssignments RequestAssignment[]
+}
+
+model RequestAssignment {
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  advisor Advisor @relation(fields: [advisorId], references: [id])
+  advisorId String
+
+  request Request @relation(fields: [requestId], references: [id])
+  requestId String
+
+  @@id([advisorId, requestId])
+}
