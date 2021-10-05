@@ -7,9 +7,10 @@ import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import Uploader from '@codeday/uploader-node';
 import { sendRequestSubmitted } from '../email';
 import { RequestType } from '../enums';
-import { PendingRequests } from '../types';
+import { PendingRequests, RequestCount } from '../types';
 import { AuthRole, Context } from '../context';
 import { getPendingRequests } from '../matching';
+import { RequestCountWhereInput } from '../inputs';
 import { uploadToBuffer } from '../utils';
 
 @Resolver()
@@ -70,5 +71,41 @@ export class RequestResolver {
 
     await sendRequestSubmitted(request);
     return true;
+  }
+
+  @Authorized(AuthRole.ADMIN)
+  @Query(() => [RequestCount])
+  async submittedRequests(
+    @Arg('where', () => RequestCountWhereInput, { nullable: true }) where?: RequestCountWhereInput,
+  ): Promise<RequestCount[]> {
+    const requests = await this.prisma.request.findMany({
+      where: where ? where.toQuery() : undefined,
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        type: true,
+        givenName: true,
+        familyName: true,
+      },
+    });
+
+    const typeToName = { INTERVIEW: 'practiceInterviews', RESUME: 'resumeReviews' };
+
+    return Object.values(requests.reduce((accum, request) => {
+      const prev = <Record<string, unknown> | undefined>accum[request.username as keyof typeof accum];
+      return {
+        ...accum,
+        [request.username]: {
+          givenName: request.givenName,
+          familyName: request.familyName,
+          username: request.username,
+          email: request.email,
+          practiceInterviews: (prev?.practiceInterviews || 0),
+          resumeReviews: (prev?.resumeRevews || 0),
+          [typeToName[request.type]]: (prev ? (<number | undefined>prev[typeToName[request.type]] || 0) : 0) + 1,
+        },
+      };
+    }, {}));
   }
 }

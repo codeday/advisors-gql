@@ -3,8 +3,10 @@ import {
 } from 'type-graphql';
 import { PrismaClient } from '@prisma/client';
 import { Inject } from 'typedi';
-import { RemainingRequestsType } from '../types';
-import { AdvisorCreateInput, AdvisorWhereInput, AdvisorLimitInput } from '../inputs';
+import { RemainingRequestsType, RequestCount } from '../types';
+import {
+  AdvisorCreateInput, AdvisorWhereInput, AdvisorLimitInput, RequestCountWhereInput,
+} from '../inputs';
 import { sendOnboard, sendChangeLimits } from '../email';
 import { getAvailableAdvisors } from '../matching';
 import { AdvisorType, RequestType } from '../enums';
@@ -50,5 +52,40 @@ export class AdvisorResolver {
           .reduce((accum, a) => accum + a.remaining[rt as RequestType], 0),
       })),
     }));
+  }
+
+  @Authorized(AuthRole.ADMIN)
+  @Query(() => [RequestCount])
+  async servedRequests(
+    @Arg('where', () => RequestCountWhereInput, { nullable: true }) where?: RequestCountWhereInput,
+  ): Promise<RequestCount[]> {
+    const advisors = await this.prisma.advisor.findMany({
+      where: where ? where.toQuery() : undefined,
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        givenName: true,
+        familyName: true,
+        requestAssignments: { select: { request: { select: { type: true } } } },
+      },
+    });
+
+    const typeToName = { INTERVIEW: 'practiceInterviews', RESUME: 'resumeReviews' };
+
+    return Object.values(advisors.reduce((accum, advisor) => ({
+      ...accum,
+      [advisor.id]: {
+        givenName: advisor.givenName,
+        familyName: advisor.familyName,
+        username: advisor.username,
+        email: advisor.email,
+        ...(advisor.requestAssignments.reduce((accum, assign) => ({
+          ...accum,
+          [typeToName[assign.request.type]]: (accum[<keyof typeof accum><unknown>typeToName[assign.request.type]])
+            + 1,
+        }), { practiceInterviews: 0, resumeReviews: 0 })),
+      },
+    }), {}));
   }
 }
