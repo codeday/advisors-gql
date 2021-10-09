@@ -5,7 +5,7 @@ import { DurationInput } from 'luxon';
 import { PrismaClient } from '@prisma/client';
 
 loadEnv();
-const requestTimeout: DurationInput = { months: 3 };
+const requestTimeout: DurationInput = { months: 1 };
 
 const config = {
   port: Number.parseInt(process.env.PORT || '5000', 10) || 5000,
