@@ -41,7 +41,7 @@ export class ProfileResolver {
   async deleteTag(
     @Arg('id', () => String) id: string,
   ): Promise<boolean> {
-    this.prisma.tag.delete({ where: { id } });
+    await this.prisma.tag.delete({ where: { id } });
     return true;
   }
 
