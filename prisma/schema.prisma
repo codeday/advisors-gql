@@ -63,3 +63,91 @@ model RequestAssignment {
 
   @@id([advisorId, requestId])
 }
+
+enum TagType {
+  INTEREST
+  TECHNOLOGY
+}
+
+model Tag {
+  id          String  @id
+  displayName String
+  type        TagType
+
+  profiles Profile[]
+}
+
+model Profile {
+  username String @id
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  givenName  String
+  familyName String
+  email      String
+  bio        String?
+
+  underrepresentedGender    Boolean
+  underrepresentedEthnicity Boolean
+
+  urlResume   String?
+  urlLinkedIn String?
+  urlGithub   String?
+  urlWebsite  String?
+
+  gradHighSchoolAt DateTime?
+  gradUniversityAt DateTime?
+  workInternAt     DateTime?
+  workFteAt        DateTime?
+
+  searchOpen        Boolean
+  searchInternships Boolean
+  searchFullTimeAt  DateTime?
+
+  experience         Tag[]
+  eventParticipation EventParticipation[]
+  recommendations    Recommendation[]
+}
+
+model EventParticipation {
+  id      String @id @default(cuid())
+  eventId String
+
+  profile         Profile @relation(fields: [profileUsername], references: [username])
+  profileUsername String
+
+  awardIds Json?
+}
+
+enum RecommendationRating {
+  INTERN_BELOW
+  INTERN_MEETS
+  INTERN_EXCEEDS
+  NEW_GRAD
+  NEW_GRAD_EXCEEDS
+}
+
+model Recommendation {
+  id String @id @default(cuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  username   String?
+  givenName  String
+  familyName String
+  title      String
+  employer   String
+
+  relation String
+
+  skillEngineering   RecommendationRating?
+  skillTechnical     RecommendationRating?
+  skillInterpersonal RecommendationRating?
+
+  recommendation String?
+
+  profile         Profile @relation(fields: [profileUsername], references: [username])
+  profileUsername String
+}

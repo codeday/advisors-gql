@@ -18,7 +18,7 @@ export class AuthContext {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   validate(): void {
     if (this.isAdmin && this.username) throw Error('Admin tokens may not specify a username or id.');
-    if (this.isRequester && !this.username) throw Error('Student applicant tokens require username.');
+    if (this.isCommunityMember && !this.username) throw Error('Student applicant tokens require username.');
   }
 
   get isAuthenticated(): boolean {
@@ -35,6 +35,14 @@ export class AuthContext {
 
   get isRequester(): boolean {
     return this.type === AuthRole.REQUESTER;
+  }
+
+  get isCommunityMember(): boolean {
+    return this.type === AuthRole.COMMUNITY_MEMBER || this.type === AuthRole.REQUESTER;
+  }
+
+  get isRecommender(): boolean {
+    return this.type === AuthRole.RECOMMENDER;
   }
 
   get username(): string | undefined {
