@@ -63,14 +63,14 @@ export class ProfileCreateInput {
 
   async toQuery(): Promise<Omit<Prisma.ProfileCreateInput, 'username'>> {
     const { resume, experience, ...rest } = this;
-    let resumeUrl: string | undefined;
+    let urlResume: string | undefined;
     if (resume) {
       const { url } = await (<Uploader>Container.get(Uploader))
         .file(await uploadToBuffer(resume), resume.filename || '_.pdf');
-      resumeUrl = url;
+      urlResume = url;
     }
     return {
-      resumeUrl,
+      urlResume,
       experience: experience ? { connect: experience.map((e) => ({ id: e })) } : undefined,
       ...rest,
     };

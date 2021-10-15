@@ -107,7 +107,7 @@ export class ProfileResolver {
   ): Promise<PrismaProfile> {
     return this.prisma.profile.create({
       data: {
-        ...data,
+        ...(await data.toQuery()),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         username: auth.username!,
       },
@@ -122,9 +122,7 @@ export class ProfileResolver {
   ): Promise<PrismaProfile> {
     return this.prisma.profile.update({
       where: { username: auth.username },
-      data: {
-        ...data,
-      },
+      data: await data.toQuery(),
     });
   }
 

@@ -86,7 +86,7 @@ model Profile {
   givenName  String
   familyName String
   email      String
-  bio        String?
+  bio        String? @db.Text
 
   underrepresentedGender    Boolean
   underrepresentedEthnicity Boolean
