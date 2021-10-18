@@ -1,9 +1,7 @@
 import { InputType, Field } from 'type-graphql';
 import { Prisma } from '@prisma/client';
-import { Container } from 'typedi';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
-import Uploader from '@codeday/uploader-node';
-import { uploadToBuffer } from '../utils';
+import { uploadResume } from '../utils';
 
 @InputType()
 export class ProfileEditInput {
@@ -63,14 +61,8 @@ export class ProfileEditInput {
 
   async toQuery(): Promise<Omit<Prisma.ProfileUpdateInput, 'username'>> {
     const { resume, experience, ...rest } = this;
-    let urlResume: string | undefined;
-    if (resume) {
-      const { url } = await (<Uploader>Container.get(Uploader))
-        .file(await uploadToBuffer(resume), resume.filename || '_.pdf');
-      urlResume = url;
-    }
     return {
-      urlResume,
+      urlResume: await uploadResume(resume),
       experience: experience ? { set: experience.map((e) => ({ id: e })) } : undefined,
       ...rest,
     };

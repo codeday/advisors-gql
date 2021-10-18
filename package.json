@@ -9,7 +9,7 @@
     "clean": "rm -rf dist",
     "prisma": "prisma format && prisma generate",
     "build": "npm -s run clean && yarn run prisma && tsc && cpy '**/*' '!**/*.ts' ../dist/ --cwd=src/ --no-overwrite --parents",
-    "dev": "ts-node-dev --no-notify --respawn --transpile-only src",
+    "dev": "ts-node-dev --no-notify --respawn --exit-child --transpile-only src",
     "debug": "ts-node-dev --no-notify --respawn src"
   },
   "dependencies": {
@@ -23,6 +23,7 @@
     "dotenv": "^8.2.0",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
+    "form-data": "^4.0.0",
     "front-matter": "^4.0.2",
     "graphql": "^15.3.0",
     "graphql-upload": "^12.0.0",
@@ -35,6 +36,7 @@
     "marked": "^2.0.7",
     "node-fetch": "^2.6.0",
     "nodemailer": "^6.6.2",
+    "pdfkit": "^0.12.3",
     "prisma": "2.26.0",
     "reflect-metadata": "^0.1.13",
     "twilio": "^3.65.0",
@@ -49,6 +51,7 @@
     "@types/node": "^14.0.27",
     "@types/node-fetch": "^2.5.7",
     "@types/nodemailer": "^6.4.2",
+    "@types/pdfkit": "^0.12.0",
     "@types/phone": "^2.4.1",
     "cpy-cli": "^3.1.1",
     "eslint": "^7.6.0",
