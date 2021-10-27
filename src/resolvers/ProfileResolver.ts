@@ -72,11 +72,15 @@ export class ProfileResolver {
     @Ctx() { auth }: Context,
     @Arg('username', () => String) username: string,
     @Arg('data', () => RecommendationCreateInput) data: RecommendationCreateInput,
+    @Arg('authorUsername', () => String, { nullable: true }) authorUsername?: string,
   ): Promise<PrismaRecommendation> {
+    if (!auth.isAdmin && authorUsername) {
+      throw new Error('Only admins can set authorUsername');
+    }
     return this.prisma.recommendation.create({
       data: {
         ...data,
-        username: auth.username,
+        username: authorUsername ?? auth.username,
         profile: { connect: { username } },
       },
     });
@@ -90,7 +94,7 @@ export class ProfileResolver {
     @Arg('data', () => RecommendationEditInput) data: RecommendationEditInput,
   ): Promise<PrismaRecommendation> {
     if (!auth.isAdmin && !auth.username) throw new Error('Cannot edit as an anonymous user.');
-    if ((await this.prisma.recommendation.count({ where: { id, username: auth.username } })) === 0) {
+    if (!auth.isAdmin && (await this.prisma.recommendation.count({ where: { id, username: auth.username } })) === 0) {
       throw new Error('Cannot edit this object.');
     }
     return this.prisma.recommendation.update({
@@ -119,7 +123,12 @@ export class ProfileResolver {
   async editProfile(
     @Ctx() { auth }: Context,
     @Arg('data', () => ProfileEditInput) data: ProfileEditInput,
+    @Arg('username', () => String, { nullable: true }) username?: string,
   ): Promise<PrismaProfile> {
+    if (!auth.isAdmin && username !== null && username !== auth.username) {
+      throw new Error('Username did not match the signed-in user.');
+    }
+
     return this.prisma.profile.update({
       where: { username: auth.username },
       data: await data.toQuery(),
@@ -130,11 +139,16 @@ export class ProfileResolver {
   @Query(() => Profile)
   async profile(
     @Ctx() { auth }: Context,
+    @Arg('username', () => String, { nullable: true }) username?: string,
   ): Promise<PrismaProfile> {
+    if (!auth.isAdmin && username !== null && username !== auth.username) {
+      throw new Error('Username did not match the signed-in user.');
+    }
+
     return this.prisma.profile.findUnique({
       rejectOnNotFound: true,
-      where: { username: auth.username },
-      include: { experience: true, eventParticipation: true },
+      where: { username: username ?? auth.username },
+      include: { experience: true, eventParticipation: true, recommendations: auth.isAdmin },
     });
   }
 }
