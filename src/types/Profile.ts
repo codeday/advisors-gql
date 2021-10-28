@@ -103,7 +103,7 @@ export class Profile {
   async fetchRecommendations(
     @Ctx() { auth }: Context,
   ): Promise<PrismaRecommendation[]> {
-    if (auth.isCommunityMember) throw new Error('You cannot read recommendations.');
+    if (auth.isCommunityMember) return [];
 
     if (!this.recommendations) {
       this.recommendations = await Container.get(PrismaClient).recommendation.findMany({

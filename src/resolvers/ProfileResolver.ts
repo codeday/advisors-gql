@@ -103,7 +103,7 @@ export class ProfileResolver {
     });
   }
 
-  @Authorized(AuthRole.REQUESTER, AuthRole.COMMUNITY_MEMBER)
+  @Authorized(AuthRole.REQUESTER, AuthRole.COMMUNITY_MEMBER, AuthRole.ADMIN)
   @Mutation(() => Profile)
   async createProfile(
     @Ctx() { auth }: Context,
@@ -118,7 +118,7 @@ export class ProfileResolver {
     });
   }
 
-  @Authorized(AuthRole.REQUESTER, AuthRole.COMMUNITY_MEMBER)
+  @Authorized(AuthRole.REQUESTER, AuthRole.COMMUNITY_MEMBER, AuthRole.ADMIN)
   @Mutation(() => Profile)
   async editProfile(
     @Ctx() { auth }: Context,
@@ -135,7 +135,7 @@ export class ProfileResolver {
     });
   }
 
-  @Authorized(AuthRole.REQUESTER, AuthRole.COMMUNITY_MEMBER)
+  @Authorized(AuthRole.REQUESTER, AuthRole.COMMUNITY_MEMBER, AuthRole.ADMIN)
   @Query(() => Profile)
   async profile(
     @Ctx() { auth }: Context,
