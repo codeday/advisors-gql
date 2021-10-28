@@ -76,7 +76,7 @@ function drawRecommendation(doc: PDFKit.PDFDocument, rec: Recommendation): void 
     .font('Helvetica')
     .text(recRatingDescription(rating as RecommendationRating), { lineBreak: i % 2 === 1 }));
 
-  doc.moveDown();
+  doc.moveDown().moveDown();
 }
 
 export function makeMetadataPdf(profile: MetadataPdfProfileInformation): Promise<Buffer> {
