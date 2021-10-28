@@ -17,10 +17,10 @@ export class ProfileCreateInput {
   @Field(() => String, { nullable: true })
   bio?: string
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { defaultValue: false })
   underrepresentedGender: boolean
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { defaultValue: false })
   underrepresentedEthnicity: boolean
 
   @Field(() => GraphQLUpload, { nullable: true })
@@ -47,10 +47,10 @@ export class ProfileCreateInput {
   @Field(() => Date, { nullable: true })
   workFteAt?: Date
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { defaultValue: false })
   searchOpen: boolean
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { defaultValue: false })
   searchInternships: boolean
 
   @Field(() => Date, { nullable: true })
