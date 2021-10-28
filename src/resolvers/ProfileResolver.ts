@@ -130,7 +130,7 @@ export class ProfileResolver {
     }
 
     return this.prisma.profile.update({
-      where: { username: auth.username },
+      where: { username: username || auth.username },
       data: await data.toQuery(),
     });
   }
