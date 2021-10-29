@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import {
   Resolver, Arg, Mutation, Query, Authorized, Ctx,
 } from 'type-graphql';
@@ -108,12 +109,17 @@ export class ProfileResolver {
   async createProfile(
     @Ctx() { auth }: Context,
     @Arg('data', () => ProfileCreateInput) data: ProfileCreateInput,
+    @Arg('username', () => String, { nullable: true }) username?: string,
   ): Promise<PrismaProfile> {
+    if (!auth.isAdmin && username !== null && username !== auth.username) {
+      throw new Error('Username did not match the signed-in user.');
+    }
+
     return this.prisma.profile.create({
       data: {
         ...(await data.toQuery()),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        username: auth.username!,
+        username: username || auth.username!,
       },
     });
   }
