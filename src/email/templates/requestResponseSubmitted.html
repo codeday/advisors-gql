@@ -1,13 +1,13 @@
-<p><strong>PLEASE REMEMBER TO CLICK REPLY-ALL INSTEAD OF REPLY.</strong></p>
-<p>
-  {{advisor.givenName}} {{advisor.familyName}} we're excited to introduce you to {{request.givenName}}
-  {{request.familyName}}, who would like to do a practice interview with you.
-</p>
-<p>
-  <strong>{{advisor.givenName}} &mdash;</strong> could you share a few times you would be available in the next few
-  weeks? (Or a link to a Calendly/When2meet/etc.) MAKE SURE TO INCLUDE YOUR TIMEZONE.
-</p>
+<p>You've received feedback from {{assignment.advisor.givenName}} {{assignment.advisor.familyName}}:</p>
+{{#if assignment.responseFile}}
+<p><a href="{{assignment.responseFile}}">DOWNLOAD FEEDBACK</a></p>
+{{#endif}}
 
+{{#if assignment.response}}
+{{#each assignment}}
+<p><strong>{{@key}}</strong><br />{{this}}</p>
+{{/each}}
+{{#endif}}
 <div>
 <div style="color: #484848;">--<br />The CodeDay Team</div>
 <div><br /><img src="https://f1.codeday.org/logo.png" /><a style="color: #bdbdbd; text-decoration: none;" href="https://www.youtube.com/watch?v=GKNBurEnGow" target="_blank" rel="noopener noreferrer"><br />There's a place in tech for everyone.</a><a style="color: #bdbdbd; text-decoration: none;" href="https://www.youtube.com/watch?v=GKNBurEnGow" target="_blank" rel="noopener noreferrer"><br /></a></div>

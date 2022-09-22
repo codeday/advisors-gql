@@ -9,3 +9,4 @@ export * from './recRatingDescription';
 export * from './seekingDescription';
 export * from './recRatingNumeric';
 export * from './mergePdfs';
+export * from './makeToken';

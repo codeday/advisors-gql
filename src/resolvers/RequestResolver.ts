@@ -2,12 +2,13 @@ import {
   Resolver, Query, Mutation, Authorized, Ctx, Arg,
 } from 'type-graphql';
 import { PrismaClient } from '@prisma/client';
+import { GraphQLJSONObject } from 'graphql-type-json';
 import { Inject } from 'typedi';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import Uploader from '@codeday/uploader-node';
-import { sendRequestSubmitted } from '../email';
+import { sendRequestResponseSubmitted, sendRequestSubmitted } from '../email';
 import { RequestType } from '../enums';
-import { PendingRequests, RequestCount } from '../types';
+import { PendingRequests, Request, RequestCount } from '../types';
 import { AuthRole, Context } from '../context';
 import { getPendingRequests } from '../matching';
 import { RequestCountWhereInput } from '../inputs';
@@ -70,6 +71,51 @@ export class RequestResolver {
     });
 
     await sendRequestSubmitted(request);
+    return true;
+  }
+
+  @Authorized(AuthRole.ADVISOR)
+  @Query(() => Request)
+  async getRequest(
+    @Ctx() { auth }: Context,
+    @Arg('request', () => String) request: string,
+  ): Promise<Request> {
+    const dbRequest = await this.prisma.requestAssignment.findUniqueOrThrow({
+      where: { advisorId_requestId: { advisorId: auth.advisorId!, requestId: request } },
+      include: { request: true },
+    });
+    return dbRequest.request;
+  }
+
+  @Authorized(AuthRole.ADVISOR)
+  @Mutation(() => Boolean)
+  async respondRequest(
+    @Ctx() { auth }: Context,
+    @Arg('request', () => String) request: string,
+    @Arg('response', () => GraphQLJSONObject, { nullable: true }) response: object,
+    @Arg('file', () => GraphQLUpload, { nullable: true }) file?: FileUpload,
+  ): Promise<boolean> {
+    const dbRequest = await this.prisma.requestAssignment.findUniqueOrThrow({
+      where: { advisorId_requestId: { advisorId: auth.advisorId!, requestId: request } },
+    });
+    if (dbRequest.response || dbRequest.responseFile) throw new Error('Response was already submitted for this request.');
+
+    let responseFile = null;
+    if (file) {
+      const { url } = await this.uploader.file(await uploadToBuffer(file), file.filename || '_.pdf');
+      responseFile = url;
+    }
+
+    const dbRequestUpdated = await this.prisma.requestAssignment.update({
+      where: { advisorId_requestId: { advisorId: auth.advisorId!, requestId: request } },
+      data: {
+        response,
+        responseFile
+      },
+      include: { advisor: true, request: true },
+    });
+
+    await sendRequestResponseSubmitted(dbRequestUpdated);
     return true;
   }
 

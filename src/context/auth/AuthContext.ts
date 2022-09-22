@@ -19,6 +19,11 @@ export class AuthContext {
   validate(): void {
     if (this.isAdmin && this.username) throw Error('Admin tokens may not specify a username or id.');
     if (this.isCommunityMember && !this.username) throw Error('Student applicant tokens require username.');
+    if (this.isAdvisor && !this.advisorId) throw Error('Request responder token must have an advisor id.');
+  }
+
+  get isAdvisor(): boolean {
+    return this.token?.typ === AuthRole.ADVISOR;
   }
 
   get isAuthenticated(): boolean {
@@ -47,6 +52,10 @@ export class AuthContext {
 
   get username(): string | undefined {
     return this.token?.username;
+  }
+
+  get advisorId(): string | undefined {
+    return this.token?.adv;
   }
 
   toWhere(): { username: string } {

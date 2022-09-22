@@ -1,5 +1,5 @@
 datasource db {
-  provider = "mysql"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
@@ -60,6 +60,9 @@ model RequestAssignment {
 
   request   Request @relation(fields: [requestId], references: [id])
   requestId String
+
+  responseFile String?
+  response Json?
 
   @@id([advisorId, requestId])
 }
