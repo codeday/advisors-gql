@@ -58,7 +58,7 @@ export async function sendRequestResponseSubmitted(assignment: RequestAssignment
   await mailTransport.sendMail({
     to: assignment.request.email,
     from: FROM,
-    subject: (assignment.request.type === 'INTERVIEW' ? 'Practice interview' : 'Resume') + `feedback from ${assignment.advisor.givenName} ${assignment.advisor.familyName}`,
+    subject: (assignment.request.type === 'INTERVIEW' ? 'Practice interview' : 'Resume') + ` feedback from ${assignment.advisor.givenName} ${assignment.advisor.familyName}`,
     html: TEMPLATES.requestResponseSubmitted({ assignment }),
   });
 
@@ -68,7 +68,7 @@ export async function sendRequestResponseSubmitted(assignment: RequestAssignment
       to: [assignment.advisor.email, assignment.request.email],
       from: FROM,
       subject: `Resume Feedback: ${assignment.advisor.givenName} <> ${assignment.request.givenName}`,
-      html: TEMPLATES.introInterview({ advisor: assignment.advisor, request: assignment.request }),
+      html: TEMPLATES.introResume({ advisor: assignment.advisor, request: assignment.request }),
     });
   }
 }
