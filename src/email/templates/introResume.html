@@ -1,17 +1,21 @@
-<p><strong>PLEASE REMEMBER TO CLICK REPLY-ALL INSTEAD OF REPLY.</strong></p>
 <p>
-  {{advisor.givenName}} {{advisor.familyName}}, we're excited to introduce you to {{request.givenName}}
-  {{request.familyName}}, a student who would like your feedback on their resume:
-  <a href="{{request.resumeUrl}}">{{request.resumeUrl}}</a>
+  {{request.givenName}}, you have received resume feedback from {{advisor.givenName}} {{advisor.familyName}} (who is copied on this email).
 </p>
 <p>
-  <strong>{{advisor.givenName}} &mdash;</strong> along with your feedback, could you let {{student.givenName}} know
-  what your current job and employer are?
+  Your next step is to make the suggested changes to your resume. After you have made the changes, you can reply-all to this
+  email to request a 10-15min call with {{advisor.givenName}} for a final review. (REMEMBER TO REPLY-ALL.)
 </p>
-<p>
-  <strong>{{request.givenName}} &mdash;</strong> it may be helpful to provide {{advisor.givenName}} with some context
-  on what roles/companies you will be applying to with this resume.
-</p>
+
+{{#if assignment.responseFile}}
+<p><a href="{{assignment.responseFile}}"><strong>DOWNLOAD FEEDBACK</strong></a></p>
+{{/if}}
+
+{{#if assignment.response}}
+{{#each assignment.response}}
+<p><strong>{{@key}}</strong><br />{{this}}</p>
+{{/each}}
+{{/if}}
+
 <div>
 <div style="color: #484848;">--<br />The CodeDay Team</div>
 <div><br /><img src="https://f1.codeday.org/logo.png" /><a style="color: #bdbdbd; text-decoration: none;" href="https://www.youtube.com/watch?v=GKNBurEnGow" target="_blank" rel="noopener noreferrer"><br />There's a place in tech for everyone.</a><a style="color: #bdbdbd; text-decoration: none;" href="https://www.youtube.com/watch?v=GKNBurEnGow" target="_blank" rel="noopener noreferrer"><br /></a></div>

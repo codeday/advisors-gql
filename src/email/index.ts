@@ -55,20 +55,19 @@ export async function sendRequestSubmitted(request: Request): Promise<void> {
 
 export async function sendRequestResponseSubmitted(assignment: RequestAssignment & { request: Request, advisor: Advisor }): Promise<void> {
   const mailTransport = Container.get<nodemailer.Transporter>('email');
-  await mailTransport.sendMail({
-    to: assignment.request.email,
-    from: FROM,
-    subject: (assignment.request.type === 'INTERVIEW' ? 'Practice interview' : 'Resume') + ` feedback from ${assignment.advisor.givenName} ${assignment.advisor.familyName}`,
-    html: TEMPLATES.requestResponseSubmitted({ assignment }),
-  });
-
-  // Send an intro email for discussing resume feedback
   if (assignment.request.type === RequestType.RESUME) {
     await mailTransport.sendMail({
       to: [assignment.advisor.email, assignment.request.email],
       from: FROM,
       subject: `Resume Feedback: ${assignment.advisor.givenName} <> ${assignment.request.givenName}`,
-      html: TEMPLATES.introResume({ advisor: assignment.advisor, request: assignment.request }),
+      html: TEMPLATES.introResume({ advisor: assignment.advisor, request: assignment.request, assignment }),
+    });
+  } else {
+    await mailTransport.sendMail({
+      to: assignment.request.email,
+      from: FROM,
+      subject: 'Practice interview feedback from ${assignment.advisor.givenName} ${assignment.advisor.familyName}',
+      html: TEMPLATES.requestResponseSubmitted({ assignment }),
     });
   }
 }
