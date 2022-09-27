@@ -85,7 +85,7 @@ export async function sendIntro(advisor: Advisor, request: Request): Promise<voi
       html: TEMPLATES.introInterview({ advisor, request }),
     });
     await mailTransport.sendMail({
-      to: [advisor.email, request.email],
+      to: advisor.email,
       from: FROM,
       subject: `[Action Required] Submit feedback on your practice interview with ${request.givenName}`,
       html: TEMPLATES.mentorInterview({ advisor, request, feedbackUrl: makeFeedbackUrl(request, advisor) }),
