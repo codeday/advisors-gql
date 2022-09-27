@@ -1,13 +1,13 @@
 <p>You've received feedback from {{assignment.advisor.givenName}} {{assignment.advisor.familyName}}:</p>
 {{#if assignment.responseFile}}
 <p><a href="{{assignment.responseFile}}">DOWNLOAD FEEDBACK</a></p>
-{{#endif}}
+{{/if}}
 
 {{#if assignment.response}}
 {{#each assignment}}
 <p><strong>{{@key}}</strong><br />{{this}}</p>
 {{/each}}
-{{#endif}}
+{{/if}}
 <div>
 <div style="color: #484848;">--<br />The CodeDay Team</div>
 <div><br /><img src="https://f1.codeday.org/logo.png" /><a style="color: #bdbdbd; text-decoration: none;" href="https://www.youtube.com/watch?v=GKNBurEnGow" target="_blank" rel="noopener noreferrer"><br />There's a place in tech for everyone.</a><a style="color: #bdbdbd; text-decoration: none;" href="https://www.youtube.com/watch?v=GKNBurEnGow" target="_blank" rel="noopener noreferrer"><br /></a></div>
