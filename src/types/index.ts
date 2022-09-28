@@ -7,3 +7,4 @@ export * from './Recommendation';
 export * from './Tag';
 export * from './EventParticipation';
 export * from './Request';
+export * from './RequestAssignment';

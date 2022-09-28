@@ -8,7 +8,7 @@ import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import Uploader from '@codeday/uploader-node';
 import { sendRequestResponseSubmitted, sendRequestSubmitted } from '../email';
 import { RequestType } from '../enums';
-import { PendingRequests, Request, RequestCount } from '../types';
+import { PendingRequests, Request, RequestAssignment, RequestCount } from '../types';
 import { AuthRole, Context } from '../context';
 import { getPendingRequests } from '../matching';
 import { RequestCountWhereInput } from '../inputs';
@@ -85,6 +85,18 @@ export class RequestResolver {
       include: { request: true },
     });
     return dbRequest.request;
+  }
+
+  @Authorized(AuthRole.ADVISOR)
+  @Query(() => RequestAssignment)
+  async getRequestAssignment(
+    @Ctx() { auth }: Context,
+    @Arg('request', () => String) request: string,
+  ): Promise<RequestAssignment> {
+    return this.prisma.requestAssignment.findUniqueOrThrow({
+      where: { advisorId_requestId: { advisorId: auth.advisorId!, requestId: request } },
+      include: { request: true },
+    });
   }
 
   @Authorized(AuthRole.ADVISOR)
