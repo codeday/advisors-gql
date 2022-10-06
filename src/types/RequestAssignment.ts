@@ -9,7 +9,7 @@ export class RequestAssignment {
   @Field(() => Request)
   request: Request
 
-  @Field(() => GraphQLJSONObject)
+  @Field(() => GraphQLJSONObject, { nullable: true })
   response: Prisma.JsonValue | object | null
 
   @Field(() => String, { nullable: true })

@@ -3,7 +3,7 @@ import {
 } from 'type-graphql';
 import { PrismaClient } from '@prisma/client';
 import { Inject } from 'typedi';
-import { RemainingRequestsType, RequestCount } from '../types';
+import { RemainingRequestsType, RequestCount, Advisor } from '../types';
 import {
   AdvisorCreateInput, AdvisorWhereInput, AdvisorLimitInput, RequestCountWhereInput,
 } from '../inputs';
@@ -36,6 +36,12 @@ export class AdvisorResolver {
     const advisor = await this.prisma.advisor.update({ where: where.toQuery(), data: { ...limits.toQuery() } });
     await sendChangeLimits(advisor);
     return true;
+  }
+
+  @Authorized(AuthRole.ADMIN)
+  @Mutation(() => [Advisor])
+  async getAdvisors(): Promise<Advisor[]> {
+    return this.prisma.advisor.findMany();
   }
 
   @Query(() => [RemainingRequestsType])
