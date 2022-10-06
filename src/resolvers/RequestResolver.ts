@@ -22,7 +22,7 @@ export class RequestResolver {
   @Inject(() => Uploader)
   private readonly uploader: Uploader;
 
-  @Authorized(AuthRole.REQUESTER)
+  @Authorized(AuthRole.REQUESTER, AuthRole.ADMIN)
   @Query(() => [PendingRequests])
   async pendingRequests(
     @Ctx() { auth }: Context,
@@ -35,7 +35,7 @@ export class RequestResolver {
     }));
   }
 
-  @Authorized(AuthRole.REQUESTER)
+  @Authorized(AuthRole.REQUESTER, AuthRole.ADMIN)
   @Mutation(() => Boolean)
   async createRequest(
     @Ctx() { auth }: Context,
