@@ -17,7 +17,6 @@ export class AuthContext {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   validate(): void {
-    if (this.isAdmin && this.username) throw Error('Admin tokens may not specify a username or id.');
     if (this.isCommunityMember && !this.username) throw Error('Student applicant tokens require username.');
     if (this.isAdvisor && !this.advisorId) throw Error('Request responder token must have an advisor id.');
   }
