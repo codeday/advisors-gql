@@ -1,0 +1,73 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "55432:5432"
+    environment:
+      POSTGRES_DB: advisors
+      POSTGRES_USER: advisors
+      POSTGRES_PASSWORD: advisors
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U advisors -d advisors"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    ports:
+      - "9200:9200"
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      DATABASE_URL: postgresql://advisors:advisors@postgres:5432/advisors?schema=public
+      DISABLE_AUTOMATION: "true"
+      AUTH_SECRET: local-dev-secret
+      AUTH_AUDIENCE: event-test-2025
+      UPLOADER_BASE: http://localhost:3000
+      UPLOADER_SECRET: local-dev-secret
+      GOTENBERG_BASE: http://localhost:3001
+      EMAIL_HOST: localhost
+      EMAIL_PORT: 1025
+      EMAIL_USER: local
+      EMAIL_PASS: local
+      EMAIL_FROM: local@example.com
+      TWILIO_ACCOUNT_SID: AC00000000000000000000000000000000
+      TWILIO_AUTH_TOKEN: local-dev-secret
+      TWILIO_PHONE: +15555555555
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://localhost:5000/graphql', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query: '{__typename}' }) }).then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  postgres_data:
+  elasticsearch_data:

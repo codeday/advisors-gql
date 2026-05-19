@@ -22,10 +22,11 @@ export class BookResolver {
     @Arg('username', () => String) username: string,
   ): Promise<string> {
     const profile = await this.prisma.profile.findUnique({
-      rejectOnNotFound: true,
       where: { username },
       include: { recommendations: true, eventParticipation: true },
     });
+
+    if (!profile) throw new Error('Profile not found.');
 
     if (!profile.urlResume) throw new Error('Profile has no resume.');
 

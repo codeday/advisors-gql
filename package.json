@@ -8,17 +8,20 @@
     "start": "node dist",
     "clean": "rm -rf dist",
     "prisma": "prisma format && prisma generate",
-    "build": "npm -s run clean && yarn run prisma && tsc && cpy '**/*' '!**/*.ts' ../dist/ --cwd=src/ --no-overwrite --parents",
+    "build": "yarn clean && yarn prisma && tsc && cp -r src/. dist/ && find dist -name '*.ts' -delete",
     "dev": "ts-node-dev --no-notify --respawn --exit-child --transpile-only src",
-    "debug": "ts-node-dev --no-notify --respawn src"
+    "debug": "ts-node-dev --no-notify --respawn src",
+    "seed-dummy": "ts-node scripts/seedDummy.ts",
+    "generate-token": "ts-node scripts/generateToken.ts",
+    "test-queries": "ts-node scripts/testQueries.ts",
+    "test-local": "yarn seed-dummy && ts-node scripts/fullLocalTest.ts"
   },
   "dependencies": {
     "@codeday/eslint-config-typescript": "^2.1.7",
     "@codeday/uploader-node": "^1.0.1",
-    "@prisma/client": "^4.3.1",
+    "@prisma/client": "^6.16.0",
     "@types/email-validator": "^1.0.6",
-    "apollo-server": "^2.16.1",
-    "apollo-server-express": "^2.16.1",
+    "apollo-server-express": "^3.13.0",
     "class-validator": "^0.12.2",
     "dotenv": "^8.2.0",
     "email-validator": "^2.0.4",
@@ -27,7 +30,7 @@
     "front-matter": "^4.0.2",
     "graphql": "^15.3.0",
     "graphql-type-json": "^0.3.2",
-    "graphql-upload": "^12.0.0",
+    "graphql-upload": "^13.0.0",
     "handlebars": "^4.7.7",
     "html-entities": "^2.3.2",
     "ical-expander": "^3.0.0",
@@ -38,7 +41,7 @@
     "node-fetch": "^2.6.0",
     "nodemailer": "^6.6.2",
     "pdfkit": "^0.12.3",
-    "prisma": "^4.3.1",
+    "prisma": "^6.16.0",
     "reflect-metadata": "^0.1.13",
     "twilio": "^3.65.0",
     "type-graphql": "^1.0.0-rc.3",
@@ -54,10 +57,9 @@
     "@types/nodemailer": "^6.4.2",
     "@types/pdfkit": "^0.12.0",
     "@types/phone": "^2.4.1",
-    "cpy-cli": "^3.1.1",
     "eslint": "^7.6.0",
-    "ts-node": "^8.10.2",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^1.0.0-pre.56",
-    "typescript": "^4.3.4"
+    "typescript": "^5.7.3"
   }
 }
