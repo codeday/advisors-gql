@@ -5,6 +5,7 @@ import { Container } from 'typedi';
 import nodemailer from 'nodemailer';
 import { RequestType } from '../enums';
 import { makeAdvisorToken } from '../utils';
+import config from '../config';
 
 const FROM = '"CodeDay" <volunteer@codeday.org>';
 const TEMPLATES = {
@@ -23,7 +24,12 @@ function makeFeedbackUrl(request: Request, advisor: Advisor) {
   return `https://jobs.codeday.org/respond/${makeAdvisorToken(advisor.id)}/${request.id}`;
 }
 
+function shouldSkipAutomation(): boolean {
+  return config.disableAutomation;
+}
+
 export async function sendOnboard(advisor: Advisor): Promise<void> {
+  if (shouldSkipAutomation()) return;
   const mailTransport = Container.get<nodemailer.Transporter>('email');
   await mailTransport.sendMail({
     to: advisor.email,
@@ -34,6 +40,7 @@ export async function sendOnboard(advisor: Advisor): Promise<void> {
 }
 
 export async function sendChangeLimits(advisor: Advisor): Promise<void> {
+  if (shouldSkipAutomation()) return;
   const mailTransport = Container.get<nodemailer.Transporter>('email');
   await mailTransport.sendMail({
     to: advisor.email,
@@ -44,16 +51,18 @@ export async function sendChangeLimits(advisor: Advisor): Promise<void> {
 }
 
 export async function sendRequestSubmitted(request: Request): Promise<void> {
+  if (shouldSkipAutomation()) return;
   const mailTransport = Container.get<nodemailer.Transporter>('email');
   await mailTransport.sendMail({
     to: request.email,
     from: FROM,
     subject: 'Confirmed Submission',
-    html: TEMPLATES.requestSubmitted({ }),
+    html: TEMPLATES.requestSubmitted({}),
   });
 }
 
 export async function sendRequestResponseSubmitted(assignment: RequestAssignment & { request: Request, advisor: Advisor }): Promise<void> {
+  if (shouldSkipAutomation()) return;
   const mailTransport = Container.get<nodemailer.Transporter>('email');
   if (assignment.request.type === RequestType.RESUME) {
     await mailTransport.sendMail({
@@ -74,6 +83,7 @@ export async function sendRequestResponseSubmitted(assignment: RequestAssignment
 
 
 export async function sendIntro(advisor: Advisor, request: Request): Promise<void> {
+  if (shouldSkipAutomation()) return;
   const mailTransport = Container.get<nodemailer.Transporter>('email');
 
   // Practice interview: send intro email + mentor feedback link
@@ -91,7 +101,7 @@ export async function sendIntro(advisor: Advisor, request: Request): Promise<voi
       html: TEMPLATES.mentorInterview({ advisor, request, feedbackUrl: makeFeedbackUrl(request, advisor) }),
     });
 
-  // Resume feedback: send individual emails to student + mentor
+    // Resume feedback: send individual emails to student + mentor
   } else if (request.type === RequestType.RESUME) {
     await mailTransport.sendMail({
       to: advisor.email,

@@ -1,8 +1,12 @@
 import { PrismaClient } from '@prisma/client';
-import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
+import type { Request } from 'express';
 import { AuthContext } from './auth';
 
 export * from './auth';
+
+type ExpressContext = {
+  req: Request;
+};
 
 const prisma = new PrismaClient();
 

@@ -52,10 +52,11 @@ export class Recommendation {
   @Field(() => Profile, { name: 'profile' })
   async fetchProfile(): Promise<PrismaProfile> {
     if (!this.profile) {
-      this.profile = await Container.get(PrismaClient).profile.findUnique({
-        rejectOnNotFound: true,
+      const profile = await Container.get(PrismaClient).profile.findUnique({
         where: { username: this.profileUsername },
       });
+      if (!profile) throw new Error('Profile not found.');
+      this.profile = profile;
     }
     return this.profile;
   }

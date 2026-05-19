@@ -80,10 +80,7 @@ export class RequestResolver {
     @Ctx() { auth }: Context,
     @Arg('request', () => String) request: string,
   ): Promise<Request> {
-    const dbRequest = await this.prisma.requestAssignment.findUniqueOrThrow({
-      where: { advisorId_requestId: { advisorId: auth.advisorId!, requestId: request } },
-      include: { request: true },
-    });
+    const dbRequest = await this.loadRequestAssignment(auth.advisorId!, request);
     return dbRequest.request;
   }
 
@@ -93,10 +90,7 @@ export class RequestResolver {
     @Ctx() { auth }: Context,
     @Arg('request', () => String) request: string,
   ): Promise<RequestAssignment> {
-    return this.prisma.requestAssignment.findUniqueOrThrow({
-      where: { advisorId_requestId: { advisorId: auth.advisorId!, requestId: request } },
-      include: { request: true },
-    });
+    return this.loadRequestAssignment(auth.advisorId!, request);
   }
 
   @Authorized(AuthRole.ADVISOR)
@@ -107,9 +101,7 @@ export class RequestResolver {
     @Arg('response', () => GraphQLJSONObject, { nullable: true }) response: object,
     @Arg('file', () => GraphQLUpload, { nullable: true }) file?: FileUpload,
   ): Promise<boolean> {
-    const dbRequest = await this.prisma.requestAssignment.findUniqueOrThrow({
-      where: { advisorId_requestId: { advisorId: auth.advisorId!, requestId: request } },
-    });
+    const dbRequest = await this.loadRequestAssignment(auth.advisorId!, request);
     if (dbRequest.response || dbRequest.responseFile) throw new Error('Response was already submitted for this request.');
 
     let responseFile = null;
@@ -129,6 +121,19 @@ export class RequestResolver {
 
     await sendRequestResponseSubmitted(dbRequestUpdated);
     return true;
+  }
+
+  private async loadRequestAssignment(advisorId: string, requestId: string): Promise<RequestAssignment> {
+    const dbRequest = await this.prisma.requestAssignment.findUnique({
+      where: { advisorId_requestId: { advisorId, requestId } },
+      include: { request: true },
+    });
+
+    if (!dbRequest) {
+      throw new Error('Request assignment not found.');
+    }
+
+    return dbRequest;
   }
 
   @Authorized(AuthRole.ADMIN)

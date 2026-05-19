@@ -151,10 +151,12 @@ export class ProfileResolver {
       throw new Error('Username did not match the signed-in user.');
     }
 
-    return this.prisma.profile.findUnique({
-      rejectOnNotFound: true,
+    const profile = await this.prisma.profile.findUnique({
       where: { username: username ?? auth.username },
       include: { experience: true, eventParticipation: true, recommendations: auth.isAdmin },
     });
+
+    if (!profile) throw new Error('Profile not found.');
+    return profile;
   }
 }
